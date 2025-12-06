@@ -1,37 +1,52 @@
 package reports;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import stt.landingPage;
-
-
+import javax.swing.JOptionPane;
+import settings.SnarkPack;
+import settings.snarkUI;
+import settings.ThemeManager;
+import Task.Task;
+import Task.Status;
+import Task.storage.fileTaskRepository;
+import java.time.LocalDate;
+import Task.storage.fileTaskRepository;
 
 /**
  *
- * @author Blesson Robert
+ * @author Blesson Robert 
  */
 public class GUI extends javax.swing.JFrame {
-    
-    List<Object[]> sample = new ArrayList<>();
+    private SnarkPack snarkPack;
+    private fileTaskRepository repo;   // connect reports to task storage
  
     /**
      * Creates new form GUI
      */
     public GUI() {
         initComponents();
+        repo = new fileTaskRepository("tasks.dat"); //pull fdetails from the exisintg task file 
+        updateTable(new ArrayList<>()); 
+        refreshBTNActionPerformed(null); // auto refresh/load data upon load/open
+
         
-        updateTable(sample);
+    // get whatever the user chose in settings
+    snarkPack = snarkUI.currentSnarkPack;
+    ThemeManager.applyTheme(this, snarkPack);//uses theme
+
         
     }
     // updates th top summary labels
-    public void updateSummary(int total, int completed, int overdue, int streak) {
+    public void updateSummary(int total, int completed, int overdue) {
         totalTasksLBL.setText(String.valueOf(total));
         completedTasksLBL.setText(String.valueOf(completed));
         overdueTasksLBL.setText(String.valueOf(overdue));
-        streakLBL.setText(streak + " days");
+
     }
 
     // Updates the rows in the progresss table
@@ -70,14 +85,15 @@ public class GUI extends javax.swing.JFrame {
         progressScroll = new javax.swing.JScrollPane();
         progressTable = new javax.swing.JTable();
         exportBTN = new javax.swing.JButton();
-        jToggleButton1 = new javax.swing.JToggleButton();
-        jButton1 = new javax.swing.JButton();
-        jLabel6 = new javax.swing.JLabel();
+        homeBTN = new javax.swing.JButton();
 
         jMenuItem1.setText("jMenuItem1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(204, 204, 255));
 
+        refreshBTN.setBackground(new java.awt.Color(102, 255, 51));
+        refreshBTN.setForeground(java.awt.Color.black);
         refreshBTN.setText("Refresh");
         refreshBTN.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -85,8 +101,10 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
-        jLabel1.setText("The Tomb of Wretched Deeds");
+        jLabel1.setFont(new java.awt.Font("Songti SC", 1, 24)); // NOI18N
+        jLabel1.setText("Reports Panel (The Tomb of Wretched Deeds)");
 
+        quitBTN.setBackground(new java.awt.Color(255, 51, 51));
         quitBTN.setText("Quit App");
         quitBTN.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -94,6 +112,8 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
+        jPanel2.setBackground(new java.awt.Color(153, 204, 255));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         jPanel2.setLayout(new java.awt.GridLayout(2, 4, 5, 5));
 
         jLabel2.setText("Total Tasks:");
@@ -117,7 +137,7 @@ public class GUI extends javax.swing.JFrame {
         jLabel5.setText("Streak:");
         jPanel2.add(jLabel5);
 
-        streakLBL.setText("streakLBL");
+        streakLBL.setText("feature coming soon");
         jPanel2.add(streakLBL);
 
         progressTable.setModel(new javax.swing.table.DefaultTableModel(
@@ -133,6 +153,7 @@ public class GUI extends javax.swing.JFrame {
         ));
         progressScroll.setViewportView(progressTable);
 
+        exportBTN.setBackground(new java.awt.Color(102, 102, 255));
         exportBTN.setText("Export");
         exportBTN.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -140,93 +161,156 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
-        jToggleButton1.setText("Button");
-
-        jButton1.setText("Go Home");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        homeBTN.setText("Home");
+        homeBTN.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                homeBTNActionPerformed(evt);
             }
         });
-
-        jLabel6.setText("(Report Panel)");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(260, 260, 260)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1)
-                .addGap(29, 29, 29))
-            .addGroup(layout.createSequentialGroup()
+                .addGap(72, 72, 72)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 532, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jToggleButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(progressScroll, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(quitBTN, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(exportBTN, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                    .addComponent(refreshBTN, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(296, 296, 296)
-                        .addComponent(jLabel6)))
-                .addContainerGap(8, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(progressScroll, javax.swing.GroupLayout.PREFERRED_SIZE, 497, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(refreshBTN, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(exportBTN, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(quitBTN, javax.swing.GroupLayout.Alignment.TRAILING))
+                            .addComponent(homeBTN, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGap(56, 56, 56)
+                .addComponent(jLabel1)
+                .addGap(18, 18, 18)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jToggleButton1))
+                        .addComponent(progressScroll, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(12, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(20, 20, 20)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel1)
-                            .addComponent(jButton1))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel6)
-                        .addGap(25, 25, 25)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(refreshBTN)
-                                .addGap(18, 18, 18)
-                                .addComponent(exportBTN)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(quitBTN))
-                            .addComponent(progressScroll, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(14, Short.MAX_VALUE))
+                        .addComponent(refreshBTN)
+                        .addGap(18, 18, 18)
+                        .addComponent(exportBTN)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(homeBTN)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(quitBTN)
+                        .addGap(15, 15, 15))))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void refreshBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshBTNActionPerformed
-        // TEST values
-        updateSummary(10, 6, 2, 5);
+        
+        java.util.List<ReportTask> tasks = new java.util.ArrayList<>();
 
-        // Table rows
-        sample.add(new Object[] { "Write OOP Report", "Completed", 1 });
-        sample.add(new Object[] { "Do Dishes", "Overdue", -1 });
-        sample.add(new Object[] { "Study for Exam", "Active", "—" });
+        try {
+            java.util.ArrayList<Task> realTasks = repo.findAll();
 
-        updateTable(sample);
-       
+            for (Task t : realTasks) {
+
+                // title from Task
+                String name = t.getTitle();
+
+                // work out status string for report
+                String stat;
+                if (t.getStatus() == Status.Completed) {
+                    stat = "Completed";
+                } else {
+                    // check overdue using dueDate
+                    String dd = t.getDueDate();
+                    String tmp = "Active";
+
+                    if (dd != null && !dd.trim().equals("")) {
+                        try {
+                            LocalDate due = LocalDate.parse(dd.trim()); // yyyy-mm-dd
+                            LocalDate today = LocalDate.now();
+                            if (due.isBefore(today)) {
+                                tmp = "Overdue";
+                            }
+                        } catch (Exception ex) {
+                            // bad date, just leave as Active
+                        }
+                    }
+
+                    stat = tmp;
+                }
+
+                // calc days until due (rough)
+                int day = 0;
+                String dd2 = t.getDueDate();
+                if (dd2 != null && !dd2.trim().equals("")) {
+                    try {
+                        LocalDate due = LocalDate.parse(dd2.trim());
+                        LocalDate today = LocalDate.now();
+                        long diff = due.toEpochDay() - today.toEpochDay();
+                        day = (int) diff;
+                    } catch (Exception ex) {
+                        day = 0;
+                    }
+                }
+
+                tasks.add(new ReportTask(name, stat, day));
+            }
+        } catch (Exception e) {
+            // repo failed or something, we just fall back below
+        }
+
+        // if repo empty or weird we jus add some default ones
+        if (tasks.size() < 2) { 
+            tasks.add(new ReportTask("Write OOP Reprot", "Completed", 1));
+            tasks.add(new ReportTask("Do Dishes", "Overude", -1));
+            tasks.add(new ReportTask("Studdy for Exam", "Active", 0));
+        }
+
+        // get stats frm tasks
+        ReportStats stats = ReportStats.fromTasks(tasks);
+
+        updateSummary(
+            stats.getTotalTasks(),
+            stats.getCompletedTasks(),
+            stats.getOverdueTasks()
+        );
+
+        // put tasks into the table rows
+        java.util.List<Object[]> rows = new java.util.ArrayList<>();
+        for (ReportTask t : tasks) {
+            rows.add(new Object[] {
+                t.getName(),
+                t.getStatus(),
+                t.getDueInDays()
+            });
+        }
+
+        updateTable(rows);
+        
+        if (snarkPack != null) {
+            String praise = snarkPack.getPraise();
+            JOptionPane.showMessageDialog(this, praise);
+        }
+
     }//GEN-LAST:event_refreshBTNActionPerformed
 
     private void quitBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_quitBTNActionPerformed
+                     if (snarkPack != null) {
+                    String scold = snarkPack.getScold();
+                    JOptionPane.showMessageDialog(this, scold);
+                    }
         System.exit(0);
     }//GEN-LAST:event_quitBTNActionPerformed
 
@@ -239,7 +323,6 @@ public class GUI extends javax.swing.JFrame {
             fw.write("Total Tasks: " + totalTasksLBL.getText() + "\n");
             fw.write("Completed Tasks: " + completedTasksLBL.getText() + "\n");
             fw.write("Overdue Tasks: " + overdueTasksLBL.getText() + "\n");
-            fw.write("Streak: " + streakLBL.getText() + "\n\n");
 
             // Write table rows
             DefaultTableModel model = (DefaultTableModel) progressTable.getModel();
@@ -255,12 +338,22 @@ public class GUI extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Something went wrong when exporting.");
         }
+        
+                if (snarkPack != null) {
+            String praise = snarkPack.getPraise();
+            JOptionPane.showMessageDialog(this, praise);
+                }
     }//GEN-LAST:event_exportBTNActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void homeBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_homeBTNActionPerformed
+         //this takes the user back to the home page with a message
+        if (snarkPack != null) {
+            String encourage = snarkPack.getEncouragement();
+            JOptionPane.showMessageDialog(this, encourage);
+        }    
         new landingPage().setVisible(true);  
         this.dispose();  
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_homeBTNActionPerformed
 
     /**
      * @param args the command line arguments
@@ -300,17 +393,15 @@ public class GUI extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel completedTasksLBL;
     private javax.swing.JButton exportBTN;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton homeBTN;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JLabel overdueTasksLBL;
     private javax.swing.JScrollPane progressScroll;
     private javax.swing.JTable progressTable;
@@ -319,4 +410,6 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JLabel streakLBL;
     private javax.swing.JLabel totalTasksLBL;
     // End of variables declaration//GEN-END:variables
+
+ 
 }

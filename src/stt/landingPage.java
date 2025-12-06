@@ -5,7 +5,10 @@
 package stt;
 import reports.GUI;  
 import settings.snarkUI;
-import tasks.taskUI;
+import Task.taskPanel;
+import settings.SnarkPack;
+import javax.swing.JOptionPane;
+import settings.ThemeManager;
 
 /*
  * classname: MainLandingPage.java
@@ -15,11 +18,14 @@ import tasks.taskUI;
  * x23471092
  */
 public class landingPage extends javax.swing.JFrame {
-    
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(landingPage.class.getName());
+        private SnarkPack snarkPack;
 
     public landingPage() {
         initComponents();
+        
+         snarkPack = snarkUI.currentSnarkPack;
+        ThemeManager.applyTheme(this, snarkPack);
     }
 
     /**
@@ -32,9 +38,9 @@ public class landingPage extends javax.swing.JFrame {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        reports = new javax.swing.JButton();
+        settings = new javax.swing.JButton();
+        tasks = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
@@ -43,28 +49,33 @@ public class landingPage extends javax.swing.JFrame {
 
         jLabel1.setFont(new java.awt.Font("Old English Text MT", 1, 24)); // NOI18N
         jLabel1.setText("Smite Thy Task!!");
-
-        jButton1.setFont(new java.awt.Font("Onyx", 0, 18)); // NOI18N
-        jButton1.setText("Reports");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+        jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel1MouseClicked(evt);
             }
         });
 
-        jButton2.setFont(new java.awt.Font("Onyx", 0, 18)); // NOI18N
-        jButton2.setText("Settings");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        reports.setFont(new java.awt.Font("Onyx", 0, 18)); // NOI18N
+        reports.setText("Reports");
+        reports.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                reportsActionPerformed(evt);
             }
         });
 
-        jButton3.setFont(new java.awt.Font("Onyx", 0, 18)); // NOI18N
-        jButton3.setText("Tasks");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        settings.setFont(new java.awt.Font("Onyx", 0, 18)); // NOI18N
+        settings.setText("Settings");
+        settings.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                settingsActionPerformed(evt);
+            }
+        });
+
+        tasks.setFont(new java.awt.Font("Onyx", 0, 18)); // NOI18N
+        tasks.setText("Tasks");
+        tasks.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tasksActionPerformed(evt);
             }
         });
 
@@ -81,11 +92,11 @@ public class landingPage extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(15, Short.MAX_VALUE)
-                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(tasks, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(reports, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(settings, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(28, 28, 28))
             .addGroup(layout.createSequentialGroup()
                 .addGap(82, 82, 82)
@@ -111,9 +122,9 @@ public class landingPage extends javax.swing.JFrame {
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2)
-                    .addComponent(jButton3))
+                    .addComponent(reports)
+                    .addComponent(settings)
+                    .addComponent(tasks))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel2)
                 .addGap(18, 18, 18)
@@ -126,20 +137,40 @@ public class landingPage extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void reportsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reportsActionPerformed
+                      if (snarkPack != null) {
+                    String encourage = snarkPack.getEncouragement();
+                    JOptionPane.showMessageDialog(this, encourage);
+}  
         new GUI().setVisible(true);  // open report
         this.dispose();              // close home
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_reportsActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-    new snarkUI().setVisible(true);  
-    this.dispose();                
-    }//GEN-LAST:event_jButton2ActionPerformed
+    private void settingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_settingsActionPerformed
+        new snarkUI().setVisible(true);  
+    this.dispose();   
+                         if (snarkPack != null) {
+                    String encourage = snarkPack.getEncouragement();
+                    JOptionPane.showMessageDialog(this, encourage);
+}  
+    }//GEN-LAST:event_settingsActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-     new taskUI().setVisible(true);  
-        this.dispose();  
-    }//GEN-LAST:event_jButton3ActionPerformed
+    private void tasksActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tasksActionPerformed
+                      if (snarkPack != null) {
+                    String encourage = snarkPack.getEncouragement();
+                    JOptionPane.showMessageDialog(this, encourage);
+}  
+        SnarkPack pack = snarkUI.currentSnarkPack;   // might be null if they havent set it yet
+    new taskPanel(pack).setVisible(true);
+    this.dispose(); 
+    }//GEN-LAST:event_tasksActionPerformed
+
+    private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
+                      if (snarkPack != null) {
+                    String encourage = snarkPack.getEncouragement();
+                    JOptionPane.showMessageDialog(this, encourage);
+}
+    }//GEN-LAST:event_jLabel1MouseClicked
 
     /**
      * @param args the command line arguments
@@ -164,15 +195,16 @@ public class landingPage extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new landingPage().setVisible(true));
+        
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JButton reports;
+    private javax.swing.JButton settings;
+    private javax.swing.JButton tasks;
     // End of variables declaration//GEN-END:variables
 }
